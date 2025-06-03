@@ -1,0 +1,18 @@
+{
+  "model": "gpt-4",
+  "input": [
+    {
+      "role": "user",
+      "content": "Roll 3 dice."
+    }
+  ],
+  "tools": [
+    {
+      "type": "mcp",
+      "server_url": "https://abcd1234.ngrok.io",
+      "server_label": "dice_roller",
+      "allowed_tools": ["roll_dice"],
+      "require_approval": "never"
+    }
+  ]
+}
