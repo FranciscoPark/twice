@@ -116,7 +116,7 @@ with opt_col:
     # Language selection
     opt2 = st.selectbox("Languages", ["english", "chinese", "french", "korean"])
     # Dataset selection
-    opt3 = st.selectbox("Datasets", ["MMLU", "helloswag", "commonsenseqa"])
+    opt3 = st.selectbox("Datasets", ["MMLU", "hellaswag", "commonsenseqa"])
     # Cache optimization toggle
     opt4 = st.checkbox("Cache Optimization", value=False)
     # Double buffering toggle
