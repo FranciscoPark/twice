@@ -28,7 +28,7 @@ def load(name: str,
          the new validation or official validation set as needed.
       4) Evaluate on the final test set. 
     """
-    api_key = "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"
+    api_key = "your_api_key"
     client = OpenAI(api_key=api_key)
 
     config = get_task_config(name)
