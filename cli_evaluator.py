@@ -119,7 +119,7 @@ if __name__ == "__main__":
                             limit=10)
     
     for i in range(10):
-        print(dataset[i])
+        print(dataset[i][0])
     to_acc = model_running(dataset=dataset, 
                         model=model, 
                         tokenizer=tokenizer, 
