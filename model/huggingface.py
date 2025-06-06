@@ -14,7 +14,7 @@ def model_running(dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenize
     
     chunks = get_batched(dataset=dataset, n=batch_size)
 
-    pbar = tqdm(total=len(dataset), desc="Running Single Selection Task")
+    pbar = tqdm(total=len(dataset), desc="Evaluation in Twice Engine..")
 
     result = [0] * len(dataset)
     for chunk in chunks:
