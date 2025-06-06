@@ -7,6 +7,7 @@ from loader.task_config import get_task_config
 import string
 from typing import Optional, Tuple, List, Any
 from openai import OpenAI, OpenAIError
+import os
 
 def load(name: str,
         tokenizer: PreTrainedTokenizer,
@@ -28,7 +29,10 @@ def load(name: str,
          the new validation or official validation set as needed.
       4) Evaluate on the final test set. 
     """
-    api_key = "your_api_key"
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY environment variable not set")
+
     client = OpenAI(api_key=api_key)
 
     config = get_task_config(name)
