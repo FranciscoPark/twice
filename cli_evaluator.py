@@ -109,7 +109,8 @@ if __name__ == "__main__":
     model_name = "meta-llama/Llama-3.1-8B"
     model, tokenizer = load_model_and_tokenizer(model_name)
 
-    dataset, answer = load(name="winogrande", 
+    data_name = "winogrande"
+    dataset, answer = load(name=data_name, 
                             instruction=False, 
                             tokenizer=tokenizer,
                             cand_type="large",
@@ -125,4 +126,4 @@ if __name__ == "__main__":
                         tokenizer=tokenizer, 
                         batch_size=16)
     result = score(to_acc, answer)
-    print(f"winogrande's result: {result}")
+    print(f"{data_name}'s result: {result}")
