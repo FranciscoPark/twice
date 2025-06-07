@@ -106,8 +106,8 @@ def evaluate(args, tasks: List[str], language: str):
 
 
 if __name__ == "__main__":
-    # model_name = "meta-llama/Llama-3.1-8B"
-    model_name = "mistralai/Mistral-7B-Instruct-v0.1"
+    model_name = "meta-llama/Llama-3.1-8B"
+
     model, tokenizer = load_model_and_tokenizer(model_name)
 
     data_name = "hellaswag"
