@@ -143,29 +143,29 @@ def load(name: str,
         trans_prompt = trans_response.choices[0].message.content
 
         local_example = """Original 1. Context: A group of friends on a road trip in California see a sign for In-N-Out. They've heard great things about it. They excitedly pull into the drive-thru. The first thing they do is
-    A. ask for a menu of their sushi options.
-    B. look for the "Animal Style" options on the secret menu or ask for a Double-Double.
-    C. try to order a bucket of fried chicken.
-    D.complain that there are no vegetarian Szechuan dishes.
+                        A. ask for a menu of their sushi options.
+                        B. look for the "Animal Style" options on the secret menu or ask for a Double-Double.
+                        C. try to order a bucket of fried chicken.
+                        D.complain that there are no vegetarian Szechuan dishes.
 
-    Localized 1. Context : 친구들이 차를 타고 가다 맘스터치 간판을 봅니다. 다들 맛집으로 유명하다는 이야기를 들었습니다. 설레는 마음으로 드라이브 스루로 들어갑니다. 그들이 제일 먼저 하는 일은: 
-A. 메뉴판을 보며 김치찌개를 시키려 합니다. 
-B. 불고기 버거 세트나 싸이버거 세트를 주문합니다. 
-C. 족발 하나를 주문하려고 합니다. 
-D. 비건 메뉴가 없다고 투덜거립니다.
+                        Localized 1. Context : 친구들이 차를 타고 가다 맘스터치 간판을 봅니다. 다들 맛집으로 유명하다는 이야기를 들었습니다. 설레는 마음으로 드라이브 스루로 들어갑니다. 그들이 제일 먼저 하는 일은: 
+                        A. 메뉴판을 보며 김치찌개를 시키려 합니다. 
+                        B. 불고기 버거 세트나 싸이버거 세트를 주문합니다. 
+                        C. 족발 하나를 주문하려고 합니다. 
+                        D. 비건 메뉴가 없다고 투덜거립니다.
 
-Original 2. Context: A high school student is getting ready for prom night. Her date is due to arrive any minute. She quickly
-A. changes into her pajamas.
-B. puts on her corsage that's been chilling in the fridge.
-C. starts studying for her math exam.
-D. decides to wash her car.
+                        Original 2. Context: A high school student is getting ready for prom night. Her date is due to arrive any minute. She quickly
+                        A. changes into her pajamas.
+                        B. puts on her corsage that's been chilling in the fridge.
+                        C. starts studying for her math exam.
+                        D. decides to wash her car.
 
-Localized 2. Context: 한 고등학생이 수학여행 장기자랑 무대에 오를 준비를 하고 있습니다. 곧 자기 차례가 다가옵니다. 그는 빠르게: 
-A. 잠옷으로 갈아입습니다. 
-B. 미리 준비한 댄스 곡에 맞춰 최종 안무를 연습합니다. 
-C. 다음날 볼 수학 시험 공부를 시작합니다. 
-D. 교실 청소를 하기로 결정합니다.
-"""
+                        Localized 2. Context: 한 고등학생이 수학여행 장기자랑 무대에 오를 준비를 하고 있습니다. 곧 자기 차례가 다가옵니다. 그는 빠르게: 
+                        A. 잠옷으로 갈아입습니다. 
+                        B. 미리 준비한 댄스 곡에 맞춰 최종 안무를 연습합니다. 
+                        C. 다음날 볼 수학 시험 공부를 시작합니다. 
+                        D. 교실 청소를 하기로 결정합니다.
+                        """
         
         # # localizing the translated prompt using GPT-4o
         # local_response = client.chat.completions.create(
