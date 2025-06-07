@@ -7,6 +7,7 @@ from loader.task_config import get_task_config
 import string
 from typing import Optional, Tuple, List, Any
 from openai import OpenAI, OpenAIError
+import os
 
 def load(name: str,
         tokenizer: PreTrainedTokenizer,
@@ -28,7 +29,7 @@ def load(name: str,
          the new validation or official validation set as needed.
       4) Evaluate on the final test set. 
     """
-    api_key = "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"
+    api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY environment variable not set")
 
@@ -81,6 +82,7 @@ def load(name: str,
 
     dataset = []
     answer_list = []
+    og_dataset = []
 
     # -------------------------
     # 2) Build prompts for each example in test set
@@ -133,23 +135,73 @@ def load(name: str,
             messages=[
                 {
                     "role": "user",
-                    "content": f"Translate the sentences below to {language}. Do not change the answer index and the symbol.\n\n{prompt}"
+                    "content": f"Please translate the following English text into {language}, ensuring that every part, including the 'Context:' label and all options (A, B, C, D), is translated without omission. Maintain the original formatting and structure. Do not change the answer index and the symbol. Include Context: \n\n{prompt}"
                 }
             ]
         )
 
         trans_prompt = trans_response.choices[0].message.content
+
+        local_example = """Original 1. Context: A group of friends on a road trip in California see a sign for In-N-Out. They've heard great things about it. They excitedly pull into the drive-thru. The first thing they do is
+    A. ask for a menu of their sushi options.
+    B. look for the "Animal Style" options on the secret menu or ask for a Double-Double.
+    C. try to order a bucket of fried chicken.
+    D.complain that there are no vegetarian Szechuan dishes.
+
+    Localized 1. Context : 친구들이 차를 타고 가다 맘스터치 간판을 봅니다. 다들 맛집으로 유명하다는 이야기를 들었습니다. 설레는 마음으로 드라이브 스루로 들어갑니다. 그들이 제일 먼저 하는 일은: 
+A. 메뉴판을 보며 김치찌개를 시키려 합니다. 
+B. 불고기 버거 세트나 싸이버거 세트를 주문합니다. 
+C. 족발 하나를 주문하려고 합니다. 
+D. 비건 메뉴가 없다고 투덜거립니다.
+
+Original 2. Context: A high school student is getting ready for prom night. Her date is due to arrive any minute. She quickly
+A. changes into her pajamas.
+B. puts on her corsage that's been chilling in the fridge.
+C. starts studying for her math exam.
+D. decides to wash her car.
+
+Localized 2. Context: 한 고등학생이 수학여행 장기자랑 무대에 오를 준비를 하고 있습니다. 곧 자기 차례가 다가옵니다. 그는 빠르게: 
+A. 잠옷으로 갈아입습니다. 
+B. 미리 준비한 댄스 곡에 맞춰 최종 안무를 연습합니다. 
+C. 다음날 볼 수학 시험 공부를 시작합니다. 
+D. 교실 청소를 하기로 결정합니다.
+"""
         
+        # # localizing the translated prompt using GPT-4o
+        # local_response = client.chat.completions.create(
+        #     model="gpt-4o",
+        #     messages=[
+        #         {
+        #             "role": "user",
+        #             "content": f"Revise the sentences below into a sentences that align with the culture of {language}-speaking regiions. Do not change {language} itself ,the answer index, and the symbol. Just localize it.\n\n{trans_prompt}"
+        #         }
+        #     ]
+        # )
+
         # localizing the translated prompt using GPT-4o
+
+        # give local example
         local_response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
                     "role": "user",
-                    "content": f"Revise the sentences below into a sentences that align with the culture of {language}-speaking regiions. Do not change {language} itself ,the answer index, and the symbol. Just localize it.\n\n{trans_prompt}"
+                    "content": f"""Please localize the following text into {language}. Ensure that cultural references are adapted to resonate with a {language} audience, modifying elements such as food items, idioms, commonsense knowledge, famous brands, and cultural practices to their {language} equivalents. Ensure that every part, including the '맥락:' or 'Context:' labels and all options (A, B, C, D), is localized without omission. Give me only the localized text, not examples. \n\n{trans_prompt} You can check the example below. \n\n{local_example}"""
                 }
             ]
         )
+
+        # do not give local example
+        # local_response = client.chat.completions.create(
+        #     model="gpt-4o",
+        #     messages=[
+        #         {
+        #             "role": "user",
+        #             "content": f"""Please localize the following text into {language}. Ensure that cultural references are adapted to resonate with a {language} audience, modifying elements such as food items, idioms, commonsense knowledge, famous brands, and cultural practices to their {language} equivalents. Ensure that every part, including the '맥락:' or 'Context:' labels and all options (A, B, C, D), is localized without omission. \n\n{trans_prompt}"""
+        #         }
+        #     ]
+        # )
+
 
         local_prompt = local_response.choices[0].message.content
         prompt_tok = tokenizer(local_prompt, add_special_tokens=True)["input_ids"]
@@ -166,11 +218,13 @@ def load(name: str,
             ])
 
         dataset.append([local_prompt, cand_list, prompt_tok, cand_list_tok, i])
+        og_dataset.append([prompt, trans_prompt, prompt_tok] )
         answer_list.append(data["answer"] if "answer" in data else None)
         pbar.update(1)
 
     # Sort by input length for efficient batching
     dataset.sort(key=lambda x: len(x[2]), reverse=True)
+    og_dataset.sort(key=lambda x: len(x[-1]), reverse=True)
 
     print(f"dataset loaded for {name}-single-{num_shot} shot-seed{fewshot_seed}")
-    return dataset, answer_list
+    return dataset, answer_list, og_dataset

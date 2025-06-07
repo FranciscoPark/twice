@@ -13,7 +13,7 @@ from typing import Tuple, Any
 def load_model_and_tokenizer(model_name: str) -> Tuple[Any, Any]:
     """Load the model and tokenizer."""
     
-    #token = os.environ.get("HUGGINGFACE_TOKEN")
+    token = os.environ.get("HUGGINGFACE_TOKEN")
 
     tokenizer = AutoTokenizer.from_pretrained(
         model_name, 
@@ -75,7 +75,7 @@ def evaluate(args, tasks: List[str], language: str):
             print(f"Evaluating {task}...")
             
             # single without instruction
-            dataset, answer = load(name=task, 
+            dataset, answer, og_dataset = load(name=task, 
                                         instruction=False, 
                                         tokenizer=tokenizer,
                                         cand_type="large",
@@ -106,11 +106,12 @@ def evaluate(args, tasks: List[str], language: str):
 
 
 if __name__ == "__main__":
-    model_name = "meta-llama/Llama-3.1-8B"
+    # model_name = "meta-llama/Llama-3.1-8B"
+    model_name = "mistralai/Mistral-7B-Instruct-v0.1"
     model, tokenizer = load_model_and_tokenizer(model_name)
 
-    data_name = "winogrande"
-    dataset, answer = load(name=data_name, 
+    data_name = "hellaswag"
+    dataset, answer, og_dataset = load(name=data_name, 
                             instruction=False, 
                             tokenizer=tokenizer,
                             cand_type="large",
@@ -120,7 +121,11 @@ if __name__ == "__main__":
                             limit=10)
     
     for i in range(10):
-        print(dataset[i][0])
+        print("LOCALIZED: " , dataset[i][0])
+        print("ORIGINAL: " , og_dataset[i][0])
+        print("TRANSLATED: " , og_dataset[i][1])
+        print("--------------------------------")
+        
     to_acc = model_running(dataset=dataset, 
                         model=model, 
                         tokenizer=tokenizer, 
