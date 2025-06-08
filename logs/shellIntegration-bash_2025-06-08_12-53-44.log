@@ -1,0 +1,50 @@
+[2025-06-08 12:53:44,903 INFO] Parsed arguments: {'model': 'meta-llama/Llama-3.1-8B', 'tasks': ['arc_easy'], 'num_fewshot': 0, 'seed': 42, 'limit': None, 'batch_size': 4, 'output_dir': 'results/meta-llama/Llama-3.1-8B_arc_easy_english', 'cache_opt': True, 'double_buffer': True, 'temperature': 1.0}
+[2025-06-08 12:53:46,171 ERROR] Exception in callback AppSession._on_scriptrunner_event.<locals>.<lambda>() at /shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/runtime/app_session.py:518
+handle: <Handle AppSession._on_scriptrunner_event.<locals>.<lambda>() at /shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/runtime/app_session.py:518>
+Traceback (most recent call last):
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/web/bootstrap.py", line 347, in run
+    if asyncio.get_running_loop().is_running():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: no running event loop
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/asyncio/events.py", line 84, in _run
+    self._context.run(self._callback, *self._args)
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/runtime/app_session.py", line 518, in <lambda>
+    lambda: self._handle_scriptrunner_event_on_event_loop(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/runtime/app_session.py", line 644, in _handle_scriptrunner_event_on_event_loop
+    self._local_sources_watcher.update_watched_modules()
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/watcher/local_sources_watcher.py", line 177, in update_watched_modules
+    self._register_necessary_watchers(modules_paths)
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/watcher/local_sources_watcher.py", line 183, in _register_necessary_watchers
+    self._register_watcher(str(Path(path).resolve()), name)
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/watcher/local_sources_watcher.py", line 136, in _register_watcher
+    watcher=PathWatcher(filepath, self.on_file_changed),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/watcher/event_based_path_watcher.py", line 107, in __init__
+    path_watcher.watch_path(
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/streamlit/watcher/event_based_path_watcher.py", line 185, in watch_path
+    folder_handler.watch = self._observer.schedule(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/observers/api.py", line 312, in schedule
+    emitter.start()
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/utils/__init__.py", line 75, in start
+    self.on_thread_start()
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/observers/inotify.py", line 119, in on_thread_start
+    self._inotify = InotifyBuffer(path, recursive=self.watch.is_recursive, event_mask=event_mask)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/observers/inotify_buffer.py", line 30, in __init__
+    self._inotify = Inotify(path, recursive=recursive, event_mask=event_mask)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/observers/inotify_c.py", line 185, in __init__
+    self._add_dir_watch(path, event_mask, recursive=recursive)
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/observers/inotify_c.py", line 404, in _add_dir_watch
+    self._add_watch(path, mask)
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/observers/inotify_c.py", line 424, in _add_watch
+    Inotify._raise_error()
+  File "/shared/s1/lab08/jypark/.conda/envs/snuenv/lib/python3.11/site-packages/watchdog/observers/inotify_c.py", line 435, in _raise_error
+    raise OSError(errno.ENOSPC, "inotify watch limit reached")
+OSError: [Errno 28] inotify watch limit reached

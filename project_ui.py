@@ -3,7 +3,10 @@ import streamlit as st
 import pandas as pd
 import time
 from io import StringIO
-
+from main import run_main_with_args
+import os
+import contextlib
+import threading
 # ==== Page configuration ====
 st.set_page_config(
     page_title="Three-Panel Dashboard",
@@ -70,29 +73,39 @@ def run(model, language, dataset, cache_opt, double_buff, temperature, log_box):
     # 이 부분에서 실행 시키고,
     # buffer.write 에 log 남기고
     # df로 결과 return
+    # Construct CLI-like arguments
+    args_list = [
+        "--model", model,
+        "--tasks", dataset,
+        "--language", language,
+        "--num_fewshot", "0",  # or based on language if you want
+        "--seed", "42",
+        "--batch_size", "4",
+        "--output_dir", f"results/{model}_{dataset}_{language}",
+    ]
 
-    for step in range(1, 11):
-        # 샘플 진행 로그를 생성하는 부분입니다.
-        timestamp = time.strftime("%H:%M:%S")
-        buffer.write(f"[{timestamp}] Step {step}/10 complete\n")
+    # You can conditionally append more args:
+    if cache_opt:
+        args_list.append("--cache_opt")
+    if double_buff:
+        args_list.append("--double_buffer")
+    args_list += ["--temperature", str(temperature)]
 
-        # 터미널 화면에 출력
-        log_box.markdown(
-            f"<div class='terminal'><pre>{buffer.getvalue()}</pre></div>",
-            unsafe_allow_html=True
-        )
+    # Optionally show the command in the log box
+    log_box.markdown(
+        f"<div class='terminal'><pre>Running: {' '.join(args_list)}</pre></div>",
+        unsafe_allow_html=True
+    )
 
-        time.sleep(0.2) 
-        
-        
-    df = pd.DataFrame(sample_data)  # 샘플 결과 return
+    # Call main evaluation logic
+    df = run_main_with_args(args_list,log_box)
 
-    ########## To DO ##########
-    ########## To DO ##########
-    ########## To DO ##########
-    ########## To DO ##########
-    
+    # Load result CSV (replace with your actual return path)
+
     return df
+
+    
+
 
 # ==== Top: title aligned left ====
 title_col, _ = st.columns([1, 5], gap="small")
@@ -108,13 +121,41 @@ opt_col, log_col, res_col = st.columns(3, gap="large")
 with opt_col:
     st.markdown("### ⚙️ Options")
     st.divider()
+    model_list = [
+        "meta-llama/Llama-3.1-8B",
+        "meta-llama/Llama-3.1-8B-Instruct",
+        "meta-llama/Llama-3.1-70B",
+        "meta-llama/Llama-3.1-70B-Instruct",
+        "meta-llama/Llama-3.2-1B",
+        "meta-llama/Llama-3.2-1B-Instruct",
+        "meta-llama/Llama-3.2-3B",
+        "meta-llama/Llama-3.2-3B-Instruct",
 
+        "Qwen/Qwen3-0.6B-Base",
+        "Qwen/Qwen3-0.6B",
+        "Qwen/Qwen3-1.7B-Base",
+        "Qwen/Qwen3-1.7B",
+        "Qwen/Qwen3-4B-Base",
+        "Qwen/Qwen3-4B",
+        "Qwen/Qwen3-8B-Base",
+        "Qwen/Qwen3-8B",
+        "Qwen/Qwen3-14B-Base",
+        "Qwen/Qwen3-14B",
+        "Qwen/Qwen3-32B",
+
+        "mistralai/Mistral-7B-v0.3",
+        "mistralai/Mistral-7B-Instruct-v0.3",
+        "mistralai/Mistral-Nemo-Base-2407",
+        "mistralai/Mistral-Nemo-Instruct-2407",
+        "mistralai/Mistral-Small-24B-Base-2501",
+        "mistralai/Mistral-Small-24B-Instruct-2501"
+    ]
     # Model selection
-    opt1 = st.selectbox("Models", ["llama", "mistral", "qwen"])
+    opt1 = st.selectbox("Models", model_list)
     # Language selection
     opt2 = st.selectbox("Languages", ["english", "chinese", "french", "korean"])
     # Dataset selection
-    opt3 = st.selectbox("Datasets", ["MMLU", "hellaswag", "commonsenseqa"])
+    opt3 = st.selectbox("Datasets", ["mmlu", "hellaswag", "openbookqa","arc_easy","arc_challenge","winogrande","custom"])
     # Cache optimization toggle
     opt4 = st.checkbox("Cache Optimization", value=False)
     # Double buffering toggle

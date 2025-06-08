@@ -9,6 +9,7 @@ from loader.task_config import MMLU_subject
 import numpy as np
 import logging # logging
 from typing import Tuple, Any
+import pandas as pd
 
 def load_model_and_tokenizer(model_name: str) -> Tuple[Any, Any]:
     """Load the model and tokenizer."""
@@ -97,12 +98,12 @@ def evaluate(args, tasks: List[str], language: str):
 	
         logger.info(f"Completed evaluation for task: {task}") # logging
     
-    save_results(final_result,args.model,seed= args.seed, shot=args.num_fewshot,tasks=tasks)
+    #save_results(final_result,args.model,seed= args.seed, shot=args.num_fewshot,tasks=tasks)
     print(final_result)
     
     logger.info(f"Complete, results saved") # logging
 
-    return
+    return pd.DataFrame(final_result)
 
 
 if __name__ == "__main__":

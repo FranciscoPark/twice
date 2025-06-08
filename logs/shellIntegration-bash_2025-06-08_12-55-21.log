@@ -1,0 +1,8 @@
+[2025-06-08 12:55:21,040 INFO] Parsed arguments: {'model': 'meta-llama/Llama-3.1-8B', 'tasks': ['arc_easy'], 'num_fewshot': 0, 'seed': 42, 'limit': None, 'batch_size': 4, 'output_dir': 'results/meta-llama/Llama-3.1-8B_arc_easy_english', 'cache_opt': False, 'double_buffer': False, 'temperature': 0.7, 'engine': 'hf'}
+[2025-06-08 12:55:21,043 ERROR] Exception during evaluate():
+[2025-06-08 12:55:21,043 ERROR] Traceback (most recent call last):
+  File "/home/s1/jypark/twice/main.py", line 117, in main
+    df =evaluate(args, tasks)
+        ^^^^^^^^^^^^^^^^^^^^^
+TypeError: evaluate() missing 1 required positional argument: 'language'
+

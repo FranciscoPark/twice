@@ -59,6 +59,38 @@ def setup_parser() -> argparse.ArgumentParser:
         default="results",
         help="Directory to save results"
     )
+
+    parser.add_argument(
+        "--cache_opt", 
+        action='store_true',
+        help="Enable cache optimization"
+    )
+
+    parser.add_argument(
+        "--double_buffer", 
+        action='store_true',
+        help="Enable double buffering"
+    )
+
+    parser.add_argument(
+        "--temperature", 
+        type=float, 
+        default=1.0,
+        help="Sampling temperature"
+    )
+    parser.add_argument(
+        "--engine", 
+        type=str, 
+        default='hf',
+        help="hf"
+    )
+    parser.add_argument(
+        "--language", 
+        type=str, 
+        default='english',
+        help="language"
+    )
+
     return parser
 
 def resolve_tasks(args: argparse.Namespace) -> List[str]:
@@ -67,9 +99,9 @@ def resolve_tasks(args: argparse.Namespace) -> List[str]:
     else:
         return args.tasks
 
-def main():
+def main(log_box):
     # 2) Set up logger at the very beginning
-    logger = setup_logger()
+    logger = setup_logger(log_box)
 
     parser = setup_parser()
     args, engine_args = parser.parse_known_args()
@@ -78,7 +110,9 @@ def main():
     logger.info(f"Parsed arguments: {vars(args)}")
     if engine_args:
         logger.info(f"Extra engine args: {engine_args}")
-
+    
+    # log_box.write("🔍 Starting evaluation...")
+    # log_box.write(f"Parsed arguments: {vars(args)}")
     # 4) Initialize the job tracker
     job_tracker = JobTracker(logger, args)
     job_tracker.start_job()
@@ -88,13 +122,14 @@ def main():
     try:
         # 5) Perform the evaluation
         if args.engine == 'hf':
-            evaluate(args, tasks)
+            df =evaluate(args, tasks,args.language)
         else:
             # For your vllm usage
-            evaluate(args, tasks, engine_args)
+            df =evaluate(args, tasks, engine_args)
 
         # If we reach here, success
         job_tracker.finish_job(success=True)
+        return df
 
     except (torch.cuda.OutOfMemoryError, RuntimeError) as e:
         # Check if it's an OOM error
@@ -150,6 +185,10 @@ def main():
         # Don't update Min_Fail_BSZ for other errors
         job_tracker.finish_job(success=False, is_oom_error=False)
         sys.exit(1)
+
+def run_main_with_args(args_list: List[str], log_box):
+    sys.argv = ["main.py"] + args_list
+    return main(log_box)
 
 if __name__ == "__main__":
     main()

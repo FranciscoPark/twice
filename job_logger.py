@@ -10,6 +10,24 @@ from pathlib import Path
 import logging
 
 # ---------------------------------------------------------------------
+# StreamlitLogHandler for logging to a Streamlit log_box
+class StreamlitLogHandler(logging.Handler):
+    def __init__(self, log_box):
+        super().__init__()
+        self.log_box = log_box
+
+    def emit(self, record):
+        import streamlit as st
+        msg = self.format(record)
+        if "log_output" not in st.session_state:
+            st.session_state["log_output"] = ""
+        st.session_state["log_output"] += msg + "\n"
+        self.log_box.markdown(
+            f"<div class='terminal'><pre>{st.session_state['log_output']}</pre></div>",
+            unsafe_allow_html=True
+        )
+
+# ---------------------------------------------------------------------
 # Globals for file paths
 
 STAT_DIR = "stat"
@@ -189,12 +207,11 @@ def update_best_fail_tracker(
         write_best_fail_tracker(lines)
 
 # ---------------------------------------------------------------------
-def setup_logger() -> logging.Logger:
+def setup_logger(log_box=None) -> logging.Logger:
     """
     Sets up a logger that writes to a file named:
       logs/{hostname}_{timestamp}.log
-    Also logs to console, but we won't attempt to strip out tqdm lines here.
-    
+    Also logs to console, and to Streamlit log_box if provided.
     Returns the logger object.
     """
     os.makedirs("logs", exist_ok=True)
@@ -202,15 +219,19 @@ def setup_logger() -> logging.Logger:
     gpu_label = Path(script_name).stem if script_name else "unknown"
     now_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     filename = f"logs/{gpu_label}_{now_str}.log"
-    
+
     log_format = "[%(asctime)s %(levelname)s] %(message)s"
+    handlers = [
+        logging.FileHandler(filename, mode='w', encoding='utf-8'),
+        logging.StreamHandler(sys.stdout)
+    ]
+    if log_box is not None:
+        handlers.append(StreamlitLogHandler(log_box))
+
     logging.basicConfig(
         level=logging.INFO,
         format=log_format,
-        handlers=[
-            logging.FileHandler(filename, mode='w', encoding='utf-8'),
-            logging.StreamHandler(sys.stdout)
-        ]
+        handlers=handlers
     )
     return logging.getLogger(__name__)
 
